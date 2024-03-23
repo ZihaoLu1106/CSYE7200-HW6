@@ -161,7 +161,7 @@ object MonadOps {
    */
   def sequenceImpatient[X](xfs: Seq[Future[X]])(millisecs: Double)(implicit ec: ExecutionContext): Future[Seq[Try[X]]] = {
     val m: Long = millisecs.toLong
-    val n: Int = (millisecs * 1000000 - m * 1000000).toInt
+    val n: Int = (millisecs * 1000000 - m * 1000000).toInt//val n: Int = (millisecs * 1000000 - m * 1000000).toInt
     Thread.sleep(m, n)
     val result: Seq[Try[X]] = xfs.foldLeft(Seq.empty[Try[X]]) {
       (a, xf) =>
@@ -171,6 +171,7 @@ object MonadOps {
         }
     }
     (Promise[Seq[Try[X]]]() complete Success(result)).future
+
   }
 
   /**
@@ -260,7 +261,10 @@ object MonadOps {
   def asOption[X](xe: Either[Throwable, X]): Option[X] =
 // TO BE IMPLEMENTED 
 
-???
+    xe match {
+      case Right(x) => Some(x)
+      case Left(_) => None
+    }
 
 
   /**

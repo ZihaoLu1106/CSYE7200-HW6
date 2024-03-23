@@ -138,19 +138,18 @@ object WebCrawler extends App {
         // In the latter, use the method createURL(Option[URL], String) to get the appropriate URL for a relative link.
         // Don't forget to run it through validateURL.
         // 16 points.
-        def getURLs(ns: Node): Seq[Try[URL]] =
-// TO BE IMPLEMENTED 
+        def getURLs(ns: Node): Seq[Try[URL]] ={
+          // TO BE IMPLEMENTED
+          val links = (ns \\ "a").map(_.attribute("href")).flatten.map(_.text)
+          links.map(link => createURL(Some(url), link).flatMap(validateURL))
+        }
 
-
-
-
-
-
+        // Retrieve content of URL and extract links
 
 
 
 // STUB
- ???
+
 // END SOLUTION
 
         def getLinks(g: String): Try[Seq[URL]] = {
@@ -163,7 +162,15 @@ object WebCrawler extends App {
 // TO BE IMPLEMENTED 
 
         // STUB
-         ???
+      for {
+        content <- getURLContent(url)
+        urlsTry = getLinks(content)
+      } yield urlsTry match {
+        case Success(urls) => urls
+        case Failure(ex) =>
+          println(s"Failed to extract URLs from $url: ${ex.getMessage}")
+          Seq.empty
+      }
         // END SOLUTION
     }
 
