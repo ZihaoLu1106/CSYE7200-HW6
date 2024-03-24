@@ -7,8 +7,8 @@ import scala.util._
 import scala.util.control.NonFatal
 
 /**
-  * @author scalaprof
-  */
+ * @author scalaprof
+ */
 //noinspection ScalaDeprecation
 object MonadOps {
 
@@ -161,7 +161,7 @@ object MonadOps {
    */
   def sequenceImpatient[X](xfs: Seq[Future[X]])(millisecs: Double)(implicit ec: ExecutionContext): Future[Seq[Try[X]]] = {
     val m: Long = millisecs.toLong
-    val n: Int = (millisecs * 1000000 - m * 1000000).toInt//val n: Int = (millisecs * 1000000 - m * 1000000).toInt
+    val n: Int = (millisecs * 1000000 - m * 1000000).toInt
     Thread.sleep(m, n)
     val result: Seq[Try[X]] = xfs.foldLeft(Seq.empty[Try[X]]) {
       (a, xf) =>
@@ -171,7 +171,6 @@ object MonadOps {
         }
     }
     (Promise[Seq[Try[X]]]() complete Success(result)).future
-
   }
 
   /**
@@ -241,9 +240,9 @@ object MonadOps {
   }
 
   def sequenceLax[X](xos: Seq[Option[X]]): Option[Seq[X]] = xos.foldLeft(Option(Seq[X]())) {
-      case (xso, None) => xso
-      case (Some(xs), Some(x)) => Some(xs :+ x)
-      case (None, Some(x)) => Some(Seq(x))
+    case (xso, None) => xso
+    case (Some(xs), Some(x)) => Some(xs :+ x)
+    case (None, Some(x)) => Some(Seq(x))
   }
 
   def guardedValue[A,B](a: A)(f: A=>Boolean)(default: A): A = if (f(a)) a else default
@@ -259,12 +258,11 @@ object MonadOps {
    * @return if xe is a Right(x) then Some(x) else None.
    */
   def asOption[X](xe: Either[Throwable, X]): Option[X] =
-// TO BE IMPLEMENTED 
-
-    xe match {
-      case Right(x) => Some(x)
-      case Left(_) => None
-    }
+    // TO BE IMPLEMENTED
+    xe match{
+    case Right(x) => Some(x)
+    case Left(_) => None
+  }
 
 
   /**
@@ -399,18 +397,18 @@ object MonadOps {
   }
 
   /**
-    * Strict form of combine.
-    * If xsy is a Failure, then the result will be the same Failure, while a successful xy will be ignored and
-    * a failing xy will be passed to onFailure.
-    * Subsequent Failures will be processed according to the onFailure function.
-    *
-    * @param xsy       a Try of Seq of X (the accumulator).
-    * @param xy        a Try of X (the addend).
-    * @param forgive   a predicate which identifies a Throwable which can be forgiven.
-    * @param onFailure a function to process a failing xy if xsy is a Failure.
-    * @tparam X the underlying type.
-    * @return a Try of Seq of X.
-    */
+   * Strict form of combine.
+   * If xsy is a Failure, then the result will be the same Failure, while a successful xy will be ignored and
+   * a failing xy will be passed to onFailure.
+   * Subsequent Failures will be processed according to the onFailure function.
+   *
+   * @param xsy       a Try of Seq of X (the accumulator).
+   * @param xy        a Try of X (the addend).
+   * @param forgive   a predicate which identifies a Throwable which can be forgiven.
+   * @param onFailure a function to process a failing xy if xsy is a Failure.
+   * @tparam X the underlying type.
+   * @return a Try of Seq of X.
+   */
   private def combineForgiving[X](xsy: Try[Seq[X]], xy: Try[X])(forgive: Throwable => Boolean, onFailure: Throwable => Unit): Try[Seq[X]] = xsy match {
     case Success(xs) =>
       xy match {
@@ -426,18 +424,18 @@ object MonadOps {
   }
 
   /**
-    * Lax form of combine.
-    * If xsy is a Success, then the result will depend on xy:
-    * If xy is a Success, then the result will be the concatenation of the underlying elements.
-    * If xy is a Failure, then its exception will be processed by onFailure, and xsy will be returned unchanged.
-    * a failing xy will be passed to onFailure.
-    * Subsequent Failures will be processed according to the onFailure function.
-    *
-    * @param xsy       a Try of Seq of X (the accumulator).
-    * @param xy        a Try of X (the addend).
-    * @param onFailure a function to process a failing xy if xsy is a Failure.
-    * @tparam X the underlying type.
-    * @return a Try of Seq of X.
+   * Lax form of combine.
+   * If xsy is a Success, then the result will depend on xy:
+   * If xy is a Success, then the result will be the concatenation of the underlying elements.
+   * If xy is a Failure, then its exception will be processed by onFailure, and xsy will be returned unchanged.
+   * a failing xy will be passed to onFailure.
+   * Subsequent Failures will be processed according to the onFailure function.
+   *
+   * @param xsy       a Try of Seq of X (the accumulator).
+   * @param xy        a Try of X (the addend).
+   * @param onFailure a function to process a failing xy if xsy is a Failure.
+   * @tparam X the underlying type.
+   * @return a Try of Seq of X.
    */
   private def combineLax[X](xsy: Try[Seq[X]], xy: Try[X])(onFailure: Throwable => Unit): Try[Seq[X]] = xsy match {
     case Success(xs) =>
